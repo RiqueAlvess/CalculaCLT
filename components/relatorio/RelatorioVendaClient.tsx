@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight, FileCheck, Mail, Printer, ShieldCheck } from "lucide-react";
 import FaqAccordion from "@/components/FaqAccordion";
 import PdfPreviewMockup from "@/components/relatorio/PdfPreviewMockup";
-import { lerRelatorioPendente, salvarUltimoPedidoId } from "@/lib/relatorio/session";
+import { lerRelatorioPendente } from "@/lib/relatorio/session";
 import type { RelatorioPayload } from "@/lib/relatorio/types";
 import { formatBRL } from "@/lib/format";
 import { KIWIFY_CHECKOUT_URL } from "@/lib/site";
@@ -16,7 +16,7 @@ const beneficios = [
   "Detalhamento linha por linha de cada verba calculada",
   "Pronto para enviar por e-mail ou imprimir",
   "Formato profissional, aceito por RH, sindicatos e advogados",
-  "Gerado na hora, sem espera",
+  "Gerado na hora, assim que o pagamento é aprovado",
 ];
 
 const objecoes = [
@@ -28,7 +28,7 @@ const objecoes = [
   {
     question: "Recebo o relatório na hora?",
     answer:
-      "Assim que o pagamento é aprovado, o PDF é enviado automaticamente para o seu e-mail. Pagamentos via Pix costumam confirmar em poucos segundos; boleto pode levar até 2 dias úteis.",
+      "Sim. Assim que o pagamento é aprovado, a Kiwify te traz de volta para o CalculaCLT e o PDF é gerado na hora, com opção de baixar imediatamente ou receber uma cópia por e-mail. Pagamentos via Pix ou cartão costumam confirmar em segundos; boleto pode levar até 2 dias úteis.",
   },
   {
     question: "Posso pedir reembolso?",
@@ -38,7 +38,7 @@ const objecoes = [
   {
     question: "Preciso ter feito o cálculo antes?",
     answer:
-      "Sim. O relatório é gerado a partir dos dados de um cálculo feito em uma das calculadoras do CalculaCLT. Se você ainda não calculou, volte para a calculadora, gere o resultado e clique em \"Gerar relatório em PDF\".",
+      "Sim. O relatório é gerado a partir dos dados de um cálculo feito em uma das calculadoras do CalculaCLT, na mesma aba do navegador. Se você ainda não calculou, volte para a calculadora, gere o resultado e clique em \"Gerar relatório em PDF\".",
   },
   {
     question: "Funciona para qualquer tipo de rescisão ou férias?",
@@ -47,70 +47,37 @@ const objecoes = [
   },
 ];
 
+function Cta({ hasPayload, className = "" }: { hasPayload: boolean; className?: string }) {
+  if (!hasPayload) {
+    return (
+      <Link
+        href="/"
+        className={`inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-6 py-4 text-base font-semibold text-white transition hover:bg-slate-800 ${className}`}
+      >
+        Faça um cálculo para continuar
+        <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+      </Link>
+    );
+  }
+  return (
+    <a
+      href={KIWIFY_CHECKOUT_URL}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg bg-accent-600 px-6 py-4 text-base font-semibold text-white transition hover:bg-accent-700 ${className}`}
+    >
+      Gerar meu relatório agora
+      <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+    </a>
+  );
+}
+
 export default function RelatorioVendaClient() {
   const [payload, setPayload] = useState<RelatorioPayload | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
     setPayload(lerRelatorioPendente());
   }, []);
 
   const valor = payload?.resultado.totalEstimado ?? null;
-
-  async function handleComprar() {
-    if (!payload) return;
-    setErro(null);
-    setLoading(true);
-    try {
-      const res = await fetch("/api/save-calculo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error("save-calculo failed");
-      const { id } = (await res.json()) as { id: string };
-      salvarUltimoPedidoId(id);
-
-      const url = new URL(KIWIFY_CHECKOUT_URL);
-      url.searchParams.set("s1", id);
-      window.location.href = url.toString();
-    } catch {
-      setErro("Não foi possível iniciar o pagamento agora. Tente novamente em instantes.");
-      setLoading(false);
-    }
-  }
-
-  const ctaLabel = !payload
-    ? "Faça um cálculo para continuar"
-    : loading
-      ? "Preparando pagamento seguro..."
-      : "Gerar meu relatório agora";
-
-  function Cta({ className = "" }: { className?: string }) {
-    if (!payload) {
-      return (
-        <Link
-          href="/"
-          className={`inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-6 py-4 text-base font-semibold text-white transition hover:bg-slate-800 ${className}`}
-        >
-          {ctaLabel}
-          <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-        </Link>
-      );
-    }
-    return (
-      <button
-        type="button"
-        onClick={handleComprar}
-        disabled={loading}
-        className={`inline-flex items-center justify-center gap-2 rounded-lg bg-accent-600 px-6 py-4 text-base font-semibold text-white transition hover:bg-accent-700 disabled:cursor-wait disabled:opacity-70 ${className}`}
-      >
-        {ctaLabel}
-        <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-      </button>
-    );
-  }
 
   return (
     <div>
@@ -134,9 +101,8 @@ export default function RelatorioVendaClient() {
           </p>
         )}
         <div className="mt-8">
-          <Cta className="w-full sm:w-auto" />
+          <Cta hasPayload={payload !== null} className="w-full sm:w-auto" />
         </div>
-        {erro && <p className="mt-3 text-sm font-medium text-red-600">{erro}</p>}
       </section>
 
       <section className="mx-auto max-w-4xl px-4 py-10 sm:px-8">
@@ -157,7 +123,7 @@ export default function RelatorioVendaClient() {
                 <Printer className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" /> Pronto para imprimir
               </span>
               <span className="flex items-center gap-1.5">
-                <Mail className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" /> Enviado por e-mail
+                <Mail className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" /> Cópia opcional por e-mail
               </span>
             </div>
           </div>
@@ -184,9 +150,8 @@ export default function RelatorioVendaClient() {
           Menos que o preço de um lanche, para não perder dinheiro que é seu por direito.
         </p>
         <div className="mt-8">
-          <Cta />
+          <Cta hasPayload={payload !== null} />
         </div>
-        {erro && <p className="mt-3 text-sm font-medium text-red-600">{erro}</p>}
       </section>
 
       <section className="mx-auto max-w-3xl px-4 py-10 sm:px-8">

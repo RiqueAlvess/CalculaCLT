@@ -10,10 +10,9 @@ As calculadoras em si são 100% estáticas (SSG) e client-side — sem backend, 
 dados, sem login. Todo o cálculo roda no navegador do usuário.
 
 Opcionalmente, o site também vende um **relatório em PDF** do cálculo
-(`/relatorio-completo`, R$ 5,99 via Kiwify). Esse fluxo pago é a única parte que usa
-backend (API Routes + Supabase + Resend) — veja `SETUP-RELATORIO-PAGO.md` para configurá-lo.
-Sem essa configuração, as calculadoras continuam funcionando normalmente; só o botão
-"Gerar relatório em PDF" fica sem efeito útil.
+(`/relatorio-completo`, R$ 5,99 via Kiwify). O PDF é gerado no próprio navegador, sem banco
+de dados — veja "Como funciona o relatório pago" abaixo e `SETUP-RELATORIO-PAGO.md` para o
+único passo opcional (envio por e-mail via Resend).
 
 ## Rodando localmente
 
@@ -42,10 +41,8 @@ app/
   calculadora-ferias-proporcionais/     → Calculadora de férias proporcionais
   sobre/page.tsx                        → Página institucional
   relatorio-completo/page.tsx           → Página de vendas do relatório em PDF
-  obrigado/page.tsx                     → Página pós-compra (Kiwify)
-  api/save-calculo/                     → Salva o cálculo antes do checkout (Supabase)
-  api/webhook/kiwify/                   → Webhook de confirmação de compra
-  api/relatorio/[id]/                   → Download do PDF + status do pedido
+  obrigado/page.tsx                     → Página pós-compra: gera o PDF no navegador
+  api/enviar-email/                     → Envio opcional do PDF por e-mail (stateless)
   sitemap.ts / robots.ts                → SEO técnico
   icon.tsx / apple-icon.tsx             → Favicons gerados dinamicamente
 components/
@@ -54,15 +51,26 @@ components/
   ...                                   → Header, Footer, FAQ, AdSlot, etc.
 lib/
   calculations/                         → Lógica pura de cálculo (fgts.ts, ferias.ts)
-  pdf/                                  → Geração do relatório em PDF (@react-pdf/renderer)
+  pdf/                                  → Geração do relatório em PDF (@react-pdf/renderer),
+                                           versão client-side (renderClient.tsx) e server-side
+                                           (render.tsx, usada só pelo envio por e-mail)
   relatorio/                            → Tipos e ponte via sessionStorage entre calculadora e venda
-  supabase.ts, kiwify.ts, resend.ts     → Integrações do relatório pago
+  resend.ts                             → Envio de e-mail
   format.ts, schema.ts, site.ts         → Utilitários compartilhados
-supabase/schema.sql                     → Migração da tabela pending_reports
 ```
 
-Veja `SETUP-RELATORIO-PAGO.md` para o passo a passo de configuração do relatório pago
-(Kiwify, Supabase, Resend).
+### Como funciona o relatório pago (sem banco de dados)
+
+1. O resultado do cálculo fica só no `sessionStorage` do navegador.
+2. "Gerar meu relatório agora" leva direto para o checkout da Kiwify.
+3. A Kiwify redireciona de volta (mesma aba) para `/obrigado`, que lê o mesmo
+   `sessionStorage` e monta o PDF ali mesmo, com `@react-pdf/renderer` rodando no navegador —
+   sem passar por nenhum servidor.
+4. Download imediato; o envio por e-mail é opcional e passa por um endpoint sem estado
+   (`/api/enviar-email`), que só existe para poder usar a API key do Resend com segurança.
+
+Veja `SETUP-RELATORIO-PAGO.md` para os detalhes, incluindo a troca de segurança consciente
+que essa simplicidade implica.
 
 ## Configuração antes do deploy
 
