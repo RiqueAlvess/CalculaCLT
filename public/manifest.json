@@ -1,0 +1,14 @@
+{
+  "name": "CalculaCLT — Calculadoras Trabalhistas",
+  "short_name": "CalculaCLT",
+  "description": "Calculadoras gratuitas de FGTS, multa rescisória e férias proporcionais CLT.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#3366ff",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/icon", "sizes": "32x32", "type": "image/png" },
+    { "src": "/apple-icon", "sizes": "180x180", "type": "image/png" }
+  ]
+}
