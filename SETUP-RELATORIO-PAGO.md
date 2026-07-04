@@ -8,6 +8,26 @@ A calculadora em si continua 100% gratuita e funcional sem nenhuma dessas
 integrações — elas só entram em ação quando alguém decide comprar o
 relatório em PDF.
 
+**Já configurado no código** (`lib/site.ts`), com o domínio de produção
+`https://calcula-clt.vercel.app` e o checkout Kiwify
+`https://pay.kiwify.com.br/6d9HiEI`:
+
+- **Link do webhook para cadastrar na Kiwify:**
+  `https://calcula-clt.vercel.app/api/webhook/kiwify?token=189715ba-c4d3-4ba3-ae34-2821768d4c00`
+- **Redirecionamento pós-compra para cadastrar na Kiwify:**
+  `https://calcula-clt.vercel.app/obrigado`
+
+O token acima (`189715ba-c4d3-4ba3-ae34-2821768d4c00`) foi gerado agora e
+**ainda não está ativo** — ele só passa a validar de verdade quando você
+definir a variável de ambiente `KIWIFY_WEBHOOK_SECRET` com esse mesmo valor
+no painel da Vercel (Settings → Environment Variables) e fizer o redeploy.
+Se preferir, gere seu próprio valor aleatório em vez deste — só use o mesmo
+nos dois lugares (URL do webhook na Kiwify e variável no Vercel).
+
+Ainda faltam Supabase e Resend (seções 1 e 2 abaixo) para o fluxo funcionar
+de ponta a ponta — sem eles, o webhook responde com erro 500 mesmo com o
+token correto.
+
 ## 1. Supabase (armazenamento temporário do cálculo)
 
 1. Crie um projeto gratuito em [supabase.com](https://supabase.com).
@@ -37,23 +57,21 @@ relatório em PDF.
 
 ## 3. Kiwify (checkout e webhook)
 
-### 3.1 Cadastrar o produto
+### 3.1 Produto e link de checkout
 
-1. No painel da Kiwify, cadastre um novo produto: **"Relatório CalculaCLT"**,
-   preço **R$ 14,90**, entrega digital (sem arquivo anexado — a entrega é
-   feita pelo nosso webhook, não pelo painel da Kiwify).
-2. Em **Redirecionamento pós-compra** (ou campo equivalente na tela de
-   checkout do produto), configure a URL para:
-   `https://SEU_DOMINIO/obrigado`
-   Não é necessário (nem confirmado que a Kiwify suporte) passar parâmetros
-   dinâmicos nessa URL — a página `/obrigado` identifica o pedido pelo ID
-   salvo no navegador do próprio comprador antes do redirecionamento para o
-   checkout.
-3. Copie o **link de checkout** do produto (algo como
-   `https://pay.kiwify.com.br/XXXXXXX`) → variável
-   `NEXT_PUBLIC_KIWIFY_CHECKOUT_URL`. Esse link precisa aceitar o parâmetro
-   de rastreio `s1` na URL (a Kiwify aceita isso nativamente para qualquer
-   checkout — é isso que carrega o ID do cálculo até o webhook).
+O produto **"Relatório CalculaCLT"** já foi cadastrado com o link de
+checkout `https://pay.kiwify.com.br/6d9HiEI` (já embutido no código como
+padrão em `lib/site.ts`). Confirme no painel da Kiwify que:
+
+- O preço está em **R$ 14,90**.
+- A entrega é digital, sem arquivo anexado no produto — quem entrega o PDF
+  é o nosso webhook, não o painel da Kiwify.
+- Em **Redirecionamento pós-compra**, a URL está configurada para:
+  `https://calcula-clt.vercel.app/obrigado`
+  Não é necessário (nem confirmado que a Kiwify suporte) passar parâmetros
+  dinâmicos nessa URL — a página `/obrigado` identifica o pedido pelo ID
+  salvo no navegador do próprio comprador antes do redirecionamento para o
+  checkout.
 
 ### 3.2 Configurar o webhook
 
@@ -61,13 +79,11 @@ relatório em PDF.
 2. Escolha o produto "Relatório CalculaCLT" e o evento **compra aprovada**
    (`order_status = paid`).
 3. Defina a URL de destino como:
-   `https://SEU_DOMINIO/api/webhook/kiwify?token=UM_SEGREDO_ALEATORIO_SEU`
-   Gere um valor aleatório longo para `UM_SEGREDO_ALEATORIO_SEU` (ex.: um
-   UUID) e use o mesmo valor na variável de ambiente `KIWIFY_WEBHOOK_SECRET`.
+   `https://calcula-clt.vercel.app/api/webhook/kiwify?token=189715ba-c4d3-4ba3-ae34-2821768d4c00`
 4. Salve. A Kiwify deve exibir um "token de segurança" próprio do webhook —
-   se ele for diferente do que você colocou na URL, o mais seguro é usar
-   **esse valor gerado pela Kiwify** como `KIWIFY_WEBHOOK_SECRET` em vez do
-   seu, e reconfigurar a URL do webhook para incluí-lo.
+   se ele for diferente do token na URL acima, o mais seguro é usar **esse
+   valor gerado pela Kiwify** como `KIWIFY_WEBHOOK_SECRET` no Vercel em vez
+   do nosso, e reconfigurar a URL do webhook para incluí-lo.
 
 ### 3.3 Testar antes de ir para produção (importante)
 
@@ -87,15 +103,20 @@ pronto:
 
 ## 4. Variáveis de ambiente (Vercel → Settings → Environment Variables)
 
+`NEXT_PUBLIC_SITE_URL` e `NEXT_PUBLIC_KIWIFY_CHECKOUT_URL` já têm um valor
+padrão certo no código (`lib/site.ts`) — só precisa defini-las aqui se
+algum dos dois mudar. As demais são obrigatórias:
+
 ```
-NEXT_PUBLIC_SITE_URL=https://seudominio.com.br
-NEXT_PUBLIC_KIWIFY_CHECKOUT_URL=https://pay.kiwify.com.br/XXXXXXX
-KIWIFY_WEBHOOK_SECRET=um-segredo-aleatorio-longo
+KIWIFY_WEBHOOK_SECRET=189715ba-c4d3-4ba3-ae34-2821768d4c00
 SUPABASE_URL=https://xxxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=a-service-role-key-do-supabase
 RESEND_API_KEY=re_xxx
 RESEND_FROM_EMAIL=CalculaCLT <relatorio@seudominio.com.br>
 ```
+
+Depois de adicionar/alterar variáveis de ambiente no Vercel, é preciso fazer
+um novo deploy (redeploy) para elas passarem a valer.
 
 ## 5. Removendo o relatório pago (se decidir não usar)
 

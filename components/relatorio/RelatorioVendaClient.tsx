@@ -8,6 +8,7 @@ import PdfPreviewMockup from "@/components/relatorio/PdfPreviewMockup";
 import { lerRelatorioPendente, salvarUltimoPedidoId } from "@/lib/relatorio/session";
 import type { RelatorioPayload } from "@/lib/relatorio/types";
 import { formatBRL } from "@/lib/format";
+import { KIWIFY_CHECKOUT_URL } from "@/lib/site";
 
 const PRECO = 14.9;
 
@@ -56,7 +57,6 @@ export default function RelatorioVendaClient() {
   }, []);
 
   const valor = payload?.resultado.totalEstimado ?? null;
-  const checkoutUrl = process.env.NEXT_PUBLIC_KIWIFY_CHECKOUT_URL;
 
   async function handleComprar() {
     if (!payload) return;
@@ -72,12 +72,7 @@ export default function RelatorioVendaClient() {
       const { id } = (await res.json()) as { id: string };
       salvarUltimoPedidoId(id);
 
-      if (!checkoutUrl) {
-        setErro("O checkout ainda não foi configurado. Tente novamente mais tarde.");
-        setLoading(false);
-        return;
-      }
-      const url = new URL(checkoutUrl);
+      const url = new URL(KIWIFY_CHECKOUT_URL);
       url.searchParams.set("s1", id);
       window.location.href = url.toString();
     } catch {
