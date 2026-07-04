@@ -63,7 +63,7 @@ O produto **"Relatório CalculaCLT"** já foi cadastrado com o link de
 checkout `https://pay.kiwify.com.br/6d9HiEI` (já embutido no código como
 padrão em `lib/site.ts`). Confirme no painel da Kiwify que:
 
-- O preço está em **R$ 14,90**.
+- O preço está em **R$ 5,99**.
 - A entrega é digital, sem arquivo anexado no produto — quem entrega o PDF
   é o nosso webhook, não o painel da Kiwify.
 - Em **Redirecionamento pós-compra**, a URL está configurada para:

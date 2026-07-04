@@ -10,7 +10,7 @@ import type { RelatorioPayload } from "@/lib/relatorio/types";
 import { formatBRL } from "@/lib/format";
 import { KIWIFY_CHECKOUT_URL } from "@/lib/site";
 
-const PRECO = 14.9;
+const PRECO = 5.99;
 
 const beneficios = [
   "Detalhamento linha por linha de cada verba calculada",

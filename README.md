@@ -10,7 +10,7 @@ As calculadoras em si são 100% estáticas (SSG) e client-side — sem backend, 
 dados, sem login. Todo o cálculo roda no navegador do usuário.
 
 Opcionalmente, o site também vende um **relatório em PDF** do cálculo
-(`/relatorio-completo`, R$ 14,90 via Kiwify). Esse fluxo pago é a única parte que usa
+(`/relatorio-completo`, R$ 5,99 via Kiwify). Esse fluxo pago é a única parte que usa
 backend (API Routes + Supabase + Resend) — veja `SETUP-RELATORIO-PAGO.md` para configurá-lo.
 Sem essa configuração, as calculadoras continuam funcionando normalmente; só o botão
 "Gerar relatório em PDF" fica sem efeito útil.
