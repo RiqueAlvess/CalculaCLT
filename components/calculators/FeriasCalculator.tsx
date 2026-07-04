@@ -5,9 +5,11 @@ import { DateInput, MoneyInput, ResultRow, SubmitCta, ToggleYesNo } from "@/comp
 import DisclaimerBanner from "@/components/DisclaimerBanner";
 import ShareButton from "@/components/ShareButton";
 import AdSlot from "@/components/AdSlot";
-import { IconBanknote, IconGift, IconSun } from "@/components/icons";
+import ReportUpsell from "@/components/calculators/ReportUpsell";
+import { Banknote, Gift, Palmtree } from "lucide-react";
 import { calcularFeriasProporcionais } from "@/lib/calculations/ferias";
 import { formatBRL, parseInputDate } from "@/lib/format";
+import type { RelatorioPayloadFerias } from "@/lib/relatorio/types";
 
 function todayInputValue(): string {
   return new Date().toISOString().slice(0, 10);
@@ -55,6 +57,21 @@ export default function FeriasCalculator() {
     setResultado(r);
   }
 
+  function buildRelatorioPayload(): RelatorioPayloadFerias | null {
+    if (!resultado || resultado.feriasJaGozadas) return null;
+    return {
+      tipo: "ferias",
+      input: {
+        salarioBruto: salario,
+        dataAdmissao: admissao,
+        dataReferencia: referencia,
+        jaTirouFerias,
+        venderAbono,
+      },
+      resultado,
+    };
+  }
+
   function buildShareText(): string {
     if (!resultado) return "";
     if (resultado.feriasJaGozadas) {
@@ -81,7 +98,7 @@ export default function FeriasCalculator() {
       <form
         id="ferias-form"
         onSubmit={handleSubmit}
-        className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 pb-28 shadow-card sm:p-6"
+        className="space-y-5 rounded-2xl border border-slate-100 bg-white p-6 pb-28 shadow-card sm:p-8"
       >
         <MoneyInput id="salario-ferias" label="Salário bruto" value={salario} onChange={setSalario} />
 
@@ -98,7 +115,7 @@ export default function FeriasCalculator() {
             <button
               type="button"
               onClick={() => setReferencia(todayInputValue())}
-              className="mt-1.5 text-xs font-semibold text-brand-600 hover:underline"
+              className="mt-1.5 text-xs font-semibold text-accent-600 hover:underline"
             >
               Usar data de hoje
             </button>
@@ -131,7 +148,7 @@ export default function FeriasCalculator() {
       {resultado && (
         <div className="animate-fade-in-up space-y-4">
           {resultado.feriasJaGozadas ? (
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-card">
+            <div className="rounded-2xl border border-slate-100 bg-white p-8 text-center shadow-card">
               <p className="text-lg font-bold text-slate-800">
                 Você já usufruiu as férias deste período aquisitivo.
               </p>
@@ -142,41 +159,41 @@ export default function FeriasCalculator() {
             </div>
           ) : (
             <>
-              <div className="rounded-2xl bg-gradient-to-br from-money-600 to-money-700 p-6 text-white shadow-result sm:p-8">
-                <p className="text-sm font-medium text-money-100">Total estimado a receber</p>
+              <div className="rounded-2xl bg-accent-700 p-7 text-white shadow-result sm:p-9">
+                <p className="text-sm font-medium text-accent-100">Total estimado a receber</p>
                 <p className="mt-1 text-4xl font-extrabold tracking-tight sm:text-5xl">
                   {formatBRL(resultado.totalEstimado)}
                 </p>
-                <p className="mt-3 text-xs text-money-100">
+                <p className="mt-3 text-xs text-accent-100">
                   {resultado.mesesAvos}/12 avos acumulados — aproximadamente {resultado.diasProporcionais} dias de férias
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card sm:p-8">
                 <h3 className="text-sm font-bold uppercase tracking-wide text-slate-400">Detalhamento do cálculo</h3>
                 <div className="mt-2 divide-y divide-slate-100">
                   <ResultRow
-                    icon={<IconSun />}
+                    icon={<Palmtree className="h-4 w-4" strokeWidth={1.75} />}
                     label="Férias proporcionais (gozo)"
                     hint={venderAbono ? "2/3 dos dias, em descanso remunerado" : `${resultado.diasProporcionais} dia(s)`}
                     value={formatBRL(resultado.valorFeriasGozo)}
                     emphasis
                   />
                   <ResultRow
-                    icon={<IconBanknote />}
+                    icon={<Banknote className="h-4 w-4" strokeWidth={1.75} />}
                     label="1/3 constitucional (gozo)"
                     value={formatBRL(resultado.tercoSobreGozo)}
                   />
                   {resultado.valorAbono > 0 && (
                     <>
                       <ResultRow
-                        icon={<IconGift />}
+                        icon={<Gift className="h-4 w-4" strokeWidth={1.75} />}
                         label="Abono pecuniário (venda de 1/3)"
                         hint={`${resultado.diasAbono} dia(s) convertido(s) em dinheiro`}
                         value={formatBRL(resultado.valorAbono)}
                       />
                       <ResultRow
-                        icon={<IconBanknote />}
+                        icon={<Banknote className="h-4 w-4" strokeWidth={1.75} />}
                         label="1/3 constitucional sobre o abono"
                         value={formatBRL(resultado.tercoSobreAbono)}
                       />
@@ -190,6 +207,11 @@ export default function FeriasCalculator() {
                   </p>
                 )}
               </div>
+
+              {(() => {
+                const payload = buildRelatorioPayload();
+                return payload ? <ReportUpsell payload={payload} /> : null;
+              })()}
 
               <DisclaimerBanner />
 

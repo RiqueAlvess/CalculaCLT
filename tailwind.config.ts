@@ -9,33 +9,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: "#eef4ff",
-          100: "#dce8ff",
-          200: "#b8d1ff",
-          300: "#8bb3ff",
-          400: "#5d8fff",
-          500: "#3366ff",
-          600: "#2249db",
-          700: "#1a37ad",
-          800: "#172d85",
-          900: "#152864",
-        },
-        money: {
+        // Single accent color for the whole product — emerald, used sparingly
+        // (primary buttons, links, the result card, the calculated total).
+        accent: {
           50: "#ecfdf5",
           100: "#d1fae5",
+          200: "#a7f3d0",
           300: "#6ee7b7",
+          400: "#34d399",
           500: "#10b981",
           600: "#059669",
           700: "#047857",
+          800: "#065f46",
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -8px rgba(15, 23, 42, 0.12)",
-        result: "0 20px 45px -15px rgba(5, 150, 105, 0.35)",
+        card: "0 2px 8px rgba(34, 34, 34, 0.06)",
+        "card-hover": "0 6px 20px rgba(34, 34, 34, 0.1)",
+        result: "0 12px 32px -8px rgba(4, 120, 87, 0.28)",
       },
       borderRadius: {
         xl2: "1.25rem",

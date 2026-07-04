@@ -6,8 +6,14 @@ Next.js (App Router) + TypeScript + Tailwind CSS:
 - **FGTS + Multa Rescisória** — `/calculadora-fgts-rescisao`
 - **Férias Proporcionais CLT** — `/calculadora-ferias-proporcionais`
 
-Site estático (SSG), sem backend, sem banco de dados, sem login. Todo o cálculo roda no
-navegador do usuário.
+As calculadoras em si são 100% estáticas (SSG) e client-side — sem backend, sem banco de
+dados, sem login. Todo o cálculo roda no navegador do usuário.
+
+Opcionalmente, o site também vende um **relatório em PDF** do cálculo
+(`/relatorio-completo`, R$ 14,90 via Kiwify). Esse fluxo pago é a única parte que usa
+backend (API Routes + Supabase + Resend) — veja `SETUP-RELATORIO-PAGO.md` para configurá-lo.
+Sem essa configuração, as calculadoras continuam funcionando normalmente; só o botão
+"Gerar relatório em PDF" fica sem efeito útil.
 
 ## Rodando localmente
 
@@ -35,15 +41,28 @@ app/
   calculadora-fgts-rescisao/page.tsx    → Calculadora de FGTS + multa rescisória
   calculadora-ferias-proporcionais/     → Calculadora de férias proporcionais
   sobre/page.tsx                        → Página institucional
+  relatorio-completo/page.tsx           → Página de vendas do relatório em PDF
+  obrigado/page.tsx                     → Página pós-compra (Kiwify)
+  api/save-calculo/                     → Salva o cálculo antes do checkout (Supabase)
+  api/webhook/kiwify/                   → Webhook de confirmação de compra
+  api/relatorio/[id]/                   → Download do PDF + status do pedido
   sitemap.ts / robots.ts                → SEO técnico
   icon.tsx / apple-icon.tsx             → Favicons gerados dinamicamente
 components/
-  calculators/                          → Formulários e campos das calculadoras
+  calculators/                          → Formulários, campos e upsell do relatório
+  relatorio/                            → Página de vendas, mockup do PDF, página de obrigado
   ...                                   → Header, Footer, FAQ, AdSlot, etc.
 lib/
   calculations/                         → Lógica pura de cálculo (fgts.ts, ferias.ts)
+  pdf/                                  → Geração do relatório em PDF (@react-pdf/renderer)
+  relatorio/                            → Tipos e ponte via sessionStorage entre calculadora e venda
+  supabase.ts, kiwify.ts, resend.ts     → Integrações do relatório pago
   format.ts, schema.ts, site.ts         → Utilitários compartilhados
+supabase/schema.sql                     → Migração da tabela pending_reports
 ```
+
+Veja `SETUP-RELATORIO-PAGO.md` para o passo a passo de configuração do relatório pago
+(Kiwify, Supabase, Resend).
 
 ## Configuração antes do deploy
 
@@ -63,12 +82,16 @@ lib/
 2. Acesse [vercel.com](https://vercel.com) e clique em **Add New Project**.
 3. Importe o repositório — a Vercel detecta automaticamente que é um projeto Next.js e
    configura o build (`next build`) e o output.
-4. Em **Environment Variables**, adicione `NEXT_PUBLIC_SITE_URL` com o domínio de produção.
+4. Em **Environment Variables**, adicione pelo menos `NEXT_PUBLIC_SITE_URL` com o domínio
+   de produção. Se for habilitar o relatório pago, adicione também as variáveis descritas em
+   `SETUP-RELATORIO-PAGO.md`.
 5. Clique em **Deploy**. Em poucos minutos o site estará no ar em um subdomínio
    `*.vercel.app`, e você pode apontar um domínio próprio em **Settings → Domains**.
 
-Nenhuma configuração adicional de servidor, banco de dados ou variáveis secretas é
-necessária — o projeto é 100% estático e roda inteiramente no plano gratuito da Vercel.
+As calculadoras são servidas como páginas estáticas. As rotas em `app/api/**` (usadas só
+pelo relatório pago) rodam como funções serverless da Vercel — ainda dentro do plano
+gratuito, mas isso significa que o projeto não é mais 100% estático se você habilitar essa
+parte.
 
 ## Aviso legal
 

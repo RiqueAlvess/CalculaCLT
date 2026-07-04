@@ -13,8 +13,8 @@ export default function SobrePage() {
   return (
     <div>
       <Breadcrumbs items={[{ name: "Sobre", path: "/sobre" }]} />
-      <article className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Sobre o CalculaCLT</h1>
+      <article className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Sobre o CalculaCLT</h1>
         <div className="article-content mt-6 text-slate-700">
           <p>
             O <strong>CalculaCLT</strong> nasceu de um problema simples: entender quanto você tem
@@ -50,9 +50,11 @@ export default function SobrePage() {
 
           <h2>Privacidade em primeiro lugar</h2>
           <p>
-            O CalculaCLT não tem backend, banco de dados ou login. Todo o cálculo acontece
-            localmente no seu navegador — nenhum salário, data ou dado pessoal que você digita é
-            enviado, armazenado ou compartilhado com terceiros.
+            As duas calculadoras são 100% gratuitas e rodam inteiramente no seu navegador — nenhum
+            salário, data ou dado pessoal que você digita nelas é enviado, armazenado ou
+            compartilhado com terceiros. A única exceção é o relatório em PDF pago (opcional): para
+            gerá-lo e enviá-lo por e-mail após a compra, guardamos os dados do cálculo por um
+            período curto e os descartamos em seguida.
           </p>
 
           <p>

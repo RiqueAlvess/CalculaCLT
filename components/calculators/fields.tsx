@@ -43,7 +43,7 @@ export function MoneyInput({ id, label, value, onChange, helperText }: MoneyInpu
           autoComplete="off"
           value={formatFromDigits(digits)}
           onChange={handleChange}
-          className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-base font-semibold text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          className="w-full rounded-lg border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-base font-semibold text-slate-900 outline-none transition focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
         />
       </div>
       {helperText && <p className="mt-1.5 text-xs text-slate-500">{helperText}</p>}
@@ -75,7 +75,7 @@ export function DateInput({ id, label, value, onChange, max, min }: DateInputPro
         max={max}
         min={min}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-base font-semibold text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+        className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3.5 text-base font-semibold text-slate-900 outline-none transition focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
       />
     </div>
   );
@@ -111,9 +111,9 @@ export function RadioCardGroup<T extends string>({
           return (
             <label
               key={option.value}
-              className={`flex cursor-pointer flex-col rounded-xl border px-4 py-3 text-sm shadow-sm transition ${
+              className={`flex cursor-pointer flex-col rounded-lg border px-4 py-3.5 text-sm transition ${
                 checked
-                  ? "border-brand-500 bg-brand-50 ring-2 ring-brand-100"
+                  ? "border-accent-500 bg-accent-50 ring-2 ring-accent-100"
                   : "border-slate-200 bg-white hover:border-slate-300"
               }`}
             >
@@ -125,7 +125,7 @@ export function RadioCardGroup<T extends string>({
                 onChange={() => onChange(option.value)}
                 className="sr-only"
               />
-              <span className={`font-semibold ${checked ? "text-brand-700" : "text-slate-800"}`}>
+              <span className={`font-semibold ${checked ? "text-accent-700" : "text-slate-800"}`}>
                 {option.label}
               </span>
               {option.description && (
@@ -159,9 +159,9 @@ export function ToggleYesNo({ label, name, value, onChange }: ToggleYesNoProps) 
           return (
             <label
               key={opt.text}
-              className={`flex cursor-pointer items-center justify-center rounded-xl border px-4 py-3 text-sm font-semibold shadow-sm transition ${
+              className={`flex cursor-pointer items-center justify-center rounded-lg border px-4 py-3.5 text-sm font-semibold transition ${
                 checked
-                  ? "border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-100"
+                  ? "border-accent-500 bg-accent-50 text-accent-700 ring-2 ring-accent-100"
                   : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
               }`}
             >
@@ -187,7 +187,7 @@ export function SubmitCta({ formId, label }: { formId: string; label: string }) 
       <button
         type="submit"
         form={formId}
-        className="hidden w-full rounded-xl bg-brand-600 py-4 text-base font-bold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-700 active:scale-[0.99] sm:block"
+        className="hidden w-full rounded-lg bg-accent-600 py-4 text-base font-semibold text-white transition hover:bg-accent-700 active:scale-[0.99] sm:block"
       >
         {label}
       </button>
@@ -195,7 +195,7 @@ export function SubmitCta({ formId, label }: { formId: string; label: string }) 
         <button
           type="submit"
           form={formId}
-          className="w-full rounded-xl bg-brand-600 py-3.5 text-base font-bold text-white shadow-lg shadow-brand-600/25 transition active:scale-[0.99]"
+          className="w-full rounded-lg bg-accent-600 py-3.5 text-base font-semibold text-white transition active:scale-[0.99]"
         >
           {label}
         </button>
@@ -220,7 +220,7 @@ export function ResultRow({
   return (
     <div className="flex items-start justify-between gap-3 py-3">
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-500">
           {icon}
         </span>
         <div>
@@ -228,7 +228,7 @@ export function ResultRow({
           {hint && <p className="text-xs text-slate-400">{hint}</p>}
         </div>
       </div>
-      <p className={`shrink-0 text-right text-sm font-bold ${emphasis ? "text-money-700" : "text-slate-800"}`}>
+      <p className={`shrink-0 text-right text-sm font-bold ${emphasis ? "text-accent-700" : "text-slate-800"}`}>
         {value}
       </p>
     </div>

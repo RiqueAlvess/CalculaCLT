@@ -5,9 +5,11 @@ import { DateInput, MoneyInput, RadioCardGroup, ResultRow, SubmitCta, ToggleYesN
 import DisclaimerBanner from "@/components/DisclaimerBanner";
 import ShareButton from "@/components/ShareButton";
 import AdSlot from "@/components/AdSlot";
-import { IconAlert, IconBanknote, IconCalendar, IconGift, IconSun, IconWallet } from "@/components/icons";
+import ReportUpsell from "@/components/calculators/ReportUpsell";
+import { Banknote, Calendar, Gift, Palmtree, TriangleAlert, Wallet } from "lucide-react";
 import { calcularFgtsRescisao, type TipoRescisao } from "@/lib/calculations/fgts";
 import { formatBRL, parseInputDate } from "@/lib/format";
+import type { RelatorioPayloadFgts } from "@/lib/relatorio/types";
 
 const TIPO_OPTIONS: { value: TipoRescisao; label: string; description: string }[] = [
   { value: "sem_justa_causa", label: "Sem justa causa", description: "Demissão pelo empregador" },
@@ -63,6 +65,21 @@ export default function FgtsCalculator() {
     setResultado(r);
   }
 
+  function buildRelatorioPayload(): RelatorioPayloadFgts | null {
+    if (!resultado) return null;
+    return {
+      tipo: "fgts",
+      input: {
+        salarioBruto: salario,
+        dataAdmissao: admissao,
+        dataDemissao: demissao,
+        tipoRescisao: tipo,
+        saldoFgtsInformado: naoSeiSaldo ? null : saldoInformado,
+      },
+      resultado,
+    };
+  }
+
   function buildShareText(): string {
     if (!resultado) return "";
     return [
@@ -82,7 +99,7 @@ export default function FgtsCalculator() {
       <form
         id="fgts-form"
         onSubmit={handleSubmit}
-        className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 pb-28 shadow-card sm:p-6"
+        className="space-y-5 rounded-2xl border border-slate-100 bg-white p-6 pb-28 shadow-card sm:p-8"
       >
         <MoneyInput id="salario" label="Salário bruto atual" value={salario} onChange={setSalario} />
 
@@ -93,7 +110,7 @@ export default function FgtsCalculator() {
             <button
               type="button"
               onClick={() => setDemissao(todayInputValue())}
-              className="mt-1.5 text-xs font-semibold text-brand-600 hover:underline"
+              className="mt-1.5 text-xs font-semibold text-accent-600 hover:underline"
             >
               Usar data de hoje
             </button>
@@ -139,22 +156,22 @@ export default function FgtsCalculator() {
 
       {resultado && (
         <div className="animate-fade-in-up space-y-4">
-          <div className="rounded-2xl bg-gradient-to-br from-money-600 to-money-700 p-6 text-white shadow-result sm:p-8">
-            <p className="text-sm font-medium text-money-100">Total estimado a receber</p>
+          <div className="rounded-2xl bg-accent-700 p-7 text-white shadow-result sm:p-9">
+            <p className="text-sm font-medium text-accent-100">Total estimado a receber</p>
             <p className="mt-1 text-4xl font-extrabold tracking-tight sm:text-5xl">
               {formatBRL(resultado.totalEstimado)}
             </p>
-            <p className="mt-3 text-xs text-money-100">
+            <p className="mt-3 text-xs text-accent-100">
               Tempo de serviço considerado: {resultado.tempoServico.anos} ano(s), {resultado.tempoServico.meses} mês(es) e{" "}
               {resultado.tempoServico.dias} dia(s).
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card sm:p-8">
             <h3 className="text-sm font-bold uppercase tracking-wide text-slate-400">Detalhamento do cálculo</h3>
             <div className="mt-2 divide-y divide-slate-100">
               <ResultRow
-                icon={<IconWallet />}
+                icon={<Wallet className="h-4 w-4" strokeWidth={1.75} />}
                 label="FGTS sacável agora"
                 hint={
                   resultado.saldoFgtsEstimado
@@ -165,36 +182,41 @@ export default function FgtsCalculator() {
                 emphasis
               />
               <ResultRow
-                icon={<IconAlert />}
+                icon={<TriangleAlert className="h-4 w-4" strokeWidth={1.75} />}
                 label="Multa rescisória"
                 hint={`${Math.round(resultado.percentualMulta * 100)}% sobre o saldo do FGTS`}
                 value={formatBRL(resultado.multaFgts)}
               />
               <ResultRow
-                icon={<IconCalendar />}
+                icon={<Calendar className="h-4 w-4" strokeWidth={1.75} />}
                 label="Aviso prévio indenizado"
                 hint={`${resultado.avisoPrevioDias} dia(s)`}
                 value={formatBRL(resultado.avisoPrevioValor)}
               />
               <ResultRow
-                icon={<IconGift />}
+                icon={<Gift className="h-4 w-4" strokeWidth={1.75} />}
                 label="13º salário proporcional"
                 hint={`${resultado.decimoTerceiroMeses}/12 avos`}
                 value={formatBRL(resultado.decimoTerceiroValor)}
               />
               <ResultRow
-                icon={<IconSun />}
+                icon={<Palmtree className="h-4 w-4" strokeWidth={1.75} />}
                 label="Férias proporcionais"
                 hint={`${resultado.feriasProporcionaisMeses}/12 avos`}
                 value={formatBRL(resultado.feriasProporcionaisValor)}
               />
               <ResultRow
-                icon={<IconBanknote />}
+                icon={<Banknote className="h-4 w-4" strokeWidth={1.75} />}
                 label="1/3 constitucional sobre férias"
                 value={formatBRL(resultado.tercoConstitucionalValor)}
               />
             </div>
           </div>
+
+          {(() => {
+            const payload = buildRelatorioPayload();
+            return payload ? <ReportUpsell payload={payload} /> : null;
+          })()}
 
           <DisclaimerBanner />
 

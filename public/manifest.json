@@ -4,8 +4,8 @@
   "description": "Calculadoras gratuitas de FGTS, multa rescisória e férias proporcionais CLT.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#3366ff",
+  "background_color": "#ffffff",
+  "theme_color": "#047857",
   "lang": "pt-BR",
   "icons": [
     { "src": "/icon", "sizes": "32x32", "type": "image/png" },

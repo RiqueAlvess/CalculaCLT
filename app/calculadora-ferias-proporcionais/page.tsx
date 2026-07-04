@@ -69,11 +69,11 @@ export default function FeriasProporcionaisPage() {
       <JsonLd data={buildFaqSchema(faqItems)} />
       <Breadcrumbs items={[{ name: "Calculadora de Férias Proporcionais", path: PATH }]} />
 
-      <section className="mx-auto max-w-3xl px-4 pb-6 pt-6 sm:px-6 sm:pt-8">
-        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+      <section className="mx-auto max-w-3xl px-4 pb-8 pt-8 sm:px-6 sm:pt-12">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-4xl">
           Calculadora de Férias Proporcionais CLT
         </h1>
-        <p className="mt-3 text-sm text-slate-600 sm:text-base">
+        <p className="mt-3 text-sm leading-relaxed text-slate-500 sm:text-base">
           Informe seu salário e as datas de admissão e referência para descobrir quantos dias de
           férias você já acumulou e quanto vai receber, incluindo o 1/3 constitucional.
         </p>
@@ -87,7 +87,7 @@ export default function FeriasProporcionaisPage() {
         <AdSlot label="Espaço reservado para anúncio (AdSense)" />
       </section>
 
-      <article className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
         <div className="article-content text-slate-700">
           <h2>Como funciona o cálculo de férias proporcionais na CLT</h2>
           <p>
@@ -146,8 +146,8 @@ export default function FeriasProporcionaisPage() {
         </div>
       </article>
 
-      <section className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
-        <h2 className="text-xl font-bold text-slate-900">Perguntas frequentes</h2>
+      <section className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+        <h2 className="text-xl font-semibold text-slate-900">Perguntas frequentes</h2>
         <div className="mt-4">
           <FaqAccordion items={faqItems} />
         </div>
@@ -158,7 +158,7 @@ export default function FeriasProporcionaisPage() {
         <div className="mt-3 flex flex-wrap gap-3 text-sm">
           <Link
             href="/calculadora-fgts-rescisao"
-            className="rounded-lg border border-slate-200 bg-white px-4 py-2 font-semibold text-brand-600 shadow-sm hover:border-brand-300"
+            className="rounded-lg border border-slate-200 bg-white px-4 py-2 font-semibold text-accent-600 shadow-sm hover:border-accent-300"
           >
             Calculadora de FGTS + Rescisão →
           </Link>
